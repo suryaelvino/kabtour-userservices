@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB: user
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: adminuser12_
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  node:
+    build:
+      context: ./user-app
+      dockerfile: Dockerfile
+    container_name: node_app
+    working_dir: /usr/src/app
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgres://user:adminuser12_@postgres:5432/user
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
