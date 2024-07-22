@@ -17,7 +17,7 @@ export const createTenant = async (req: Request, res: Response) => {
 export const getTenants = async (req: Request, res: Response) => {
     try {
         const tenants = await tenantService.getTenants();
-        res.status(200).json(tenants);
+        res.status(200).json({ data:tenants });
     } catch (error) {
         console.error('Error fetching tenants:', error);
         res.status(500).json({ error: 'Error fetching tenants' });
@@ -43,9 +43,9 @@ export const getTenantById = async (req: Request, res: Response) => {
 export const updateTenant = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { name, description, email, app_name } = req.body;
-
+    const update_at = new Date;
     try {
-        const tenant = await tenantService.updateTenant(Number(id), { name, description, email, app_name });
+        const tenant = await tenantService.updateTenant(Number(id), { name, description, email, app_name, update_at });
         res.status(200).json(tenant);
     } catch (error:any) {
         console.error('Error updating tenant:', error);

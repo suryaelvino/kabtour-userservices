@@ -3,20 +3,23 @@ import { sequelize } from '../config/database';
 
 class Tenant extends Model {
     public id!: number;
-    public filename!: string;
-    public data!: Buffer;
-    public userId!: number;
+    public name!: string;
+    public description!: string;
+    public email!: string;
+    public app_name!: string;
+    public created_at!: Date;
+    public update_at!: Date;
 }
 
 Tenant.init({
     id: {
         type: DataTypes.INTEGER,
-        autoIncrement: true,
         primaryKey: true
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     description: {
         type: DataTypes.STRING,
@@ -24,17 +27,18 @@ Tenant.init({
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     app_name: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    created_at :{
+    created_at: {
         type: DataTypes.DATE,
         allowNull: false
     },
-    update_at :{
+    update_at: {
         type: DataTypes.DATE,
         allowNull: false
     }
@@ -42,7 +46,20 @@ Tenant.init({
     sequelize,
     modelName: 'Tenant',
     tableName: 'tenant',
-    timestamps: false
+    timestamps: false,
+    hooks: {
+        beforeCreate: async (tenant) => {
+            let unique = false;
+            while (!unique) {
+                const id = Math.floor(Math.random() * 100000000);
+                const existingTenant = await Tenant.findByPk(id);
+                if (!existingTenant) {
+                    tenant.id = id;
+                    unique = true;
+                }
+            }
+        }
+    }
 });
 
 export default Tenant;
