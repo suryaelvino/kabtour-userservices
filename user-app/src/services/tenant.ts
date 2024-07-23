@@ -1,32 +1,63 @@
 import Tenant from '../models/tenant';
 
-export const createTenant = async (data: { name?: string, description?: string, email?: string, app_name?: string, created_at?: Date, update_at?: Date }) => {
-    return Tenant.create(data);
-};
-
-export const getTenants = async () => {
-    return Tenant.findAll({
-        attributes: ['id', 'name', 'app_name']
-    });
-};
-
-export const getTenantById = async (id: number) => {
-    return Tenant.findByPk(id);
-};
-
-export const updateTenant = async (id: number, data: { name?: string, description?: string, email?: string, app_name?: string, update_at: Date }) => {
-    const tenant = await Tenant.findByPk(id);
-    if (tenant) {
-        return tenant.update(data);
+class TenantService {
+    async createTenant(data: { name?: string, description?: string, email?: string, app_name?: string, created_at?: Date, update_at?: Date }) {
+        try {
+            const tenant = await Tenant.create(data);
+            return Promise.resolve(tenant);
+        } catch (error) {
+            return Promise.reject(error);
+        }
     }
-    throw new Error('Tenant not found');
-};
 
-export const deleteTenant = async (id: number) => {
-    const tenant = await Tenant.findByPk(id);
-    if (tenant) {
-        await tenant.destroy();
-    } else {
-        throw new Error('Tenant not found');
+    async getTenants() {
+        try {
+            const tenants = await Tenant.findAll({
+                attributes: ['id', 'name', 'app_name']
+            });
+            return Promise.resolve(tenants);
+        } catch (error) {
+            return Promise.reject(error);
+        }
     }
-};
+
+    async getTenantById(id: number) {
+        try {
+            const tenant = await Tenant.findByPk(id);
+            if (tenant) {
+                return Promise.resolve(tenant);
+            }
+            throw new Error('Tenant not found');
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async updateTenant(id: number, data: { name?: string, description?: string, email?: string, app_name?: string, update_at?: Date }) {
+        try {
+            const tenant = await Tenant.findByPk(id);
+            if (tenant) {
+                const updatedTenant = await tenant.update(data);
+                return Promise.resolve(updatedTenant);
+            }
+            throw new Error('Tenant not found');
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async deleteTenant(id: number) {
+        try {
+            const tenant = await Tenant.findByPk(id);
+            if (tenant) {
+                await tenant.destroy();
+                return Promise.resolve();
+            }
+            throw new Error('Tenant not found');
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+}
+
+export default new TenantService();
