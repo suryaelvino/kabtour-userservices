@@ -22,7 +22,7 @@ Tenant.init({
         unique: true
     },
     description: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(1000),
         allowNull: false
     },
     email: {
