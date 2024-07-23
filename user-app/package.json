@@ -5,6 +5,8 @@
   "scripts": {
     "start": "node ./dist/index.js",
     "build": "npx tsc",
+    "migrate" : "npx sequelize-cli db:migrate", 
+    "undomigrate": "npx sequelize-cli db:migrate:undo",
     "dev": "nodemon"
   },
   "keywords": [],

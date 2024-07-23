@@ -57,7 +57,6 @@ export const updateTenant = async (req: Request, res: Response) => {
     }
 };
 
-// Hapus Tenant berdasarkan ID
 export const deleteTenant = async (req: Request, res: Response) => {
     const { id } = req.params;
 
