@@ -6,6 +6,7 @@ class Tenant extends Model {
     public name!: string;
     public description!: string;
     public email!: string;
+    public business!: object;
     public app_name!: string;
     public created_at!: Date;
     public update_at!: Date;
@@ -22,7 +23,11 @@ Tenant.init({
         unique: true
     },
     description: {
-        type: DataTypes.STRING(1000),
+        type: DataTypes.STRING(2000),
+        allowNull: false
+    },
+    business:{
+        type: DataTypes.JSONB,
         allowNull: false
     },
     email: {

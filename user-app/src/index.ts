@@ -1,6 +1,7 @@
 import express, { Application } from 'express';
 import sequelize from './config/database';
-import tenantRoutes from './routes/tenant';
+import tenantRoutes from './routes/tenantRoutes';
+import businessRoutes from './routes/businessRoutes';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
@@ -26,6 +27,7 @@ class Server {
 
     private routes() {
         this.app.use('/tenant', tenantRoutes);
+        this.app.use('/business', businessRoutes);
     }
 
     private async database() {

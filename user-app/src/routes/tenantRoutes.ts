@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import TenantController from '../controllers/tenant';
-import { validateTenantInput } from '../middleware/tenant';
+import TenantController from '../controllers/tenantControllers';
+import { validateTenantInput } from '../middleware/tenantMiddleware';
 
 class TenantRoutes {
     public router: Router;
