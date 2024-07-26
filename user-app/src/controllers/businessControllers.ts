@@ -5,8 +5,10 @@ import { StatusCodes } from 'http-status-codes';
 class BusinessController {
     async createBusiness(req: Request, res: Response) {
         const { name } = req.body;
+        const created_at = new Date();
+        const update_at = new Date();
         try {
-            const business = await BusinessService.createBusiness({ name });
+            const business = await BusinessService.createBusiness({ name, created_at, update_at });
             return res.status(StatusCodes.CREATED).json({ data: business });
         } catch (error: any) {
             console.error('Error creating business:', error);

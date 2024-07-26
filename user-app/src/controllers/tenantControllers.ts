@@ -4,13 +4,14 @@ import { StatusCodes } from 'http-status-codes';
 
 class TenantController {
     async createTenant(req: Request, res: Response) {
-        const { name, description, email, app_name } = req.body;
+        const { name, description, email, app_name, business } = req.body;
         try {
             const tenant = await TenantService.createTenant({
                 name,
                 description,
                 email,
                 app_name,
+                business,
                 created_at: new Date(),
                 update_at: new Date()
             });
@@ -23,6 +24,9 @@ class TenantController {
                 }
                 if (error.message.includes('email already exists')) {
                     return res.status(StatusCodes.CONFLICT).json({ error: 'Tenant email already exists' });
+                }
+                if (error.message.includes('Some business IDs are invalid')) {
+                    return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid business IDs' });
                 }
             }
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error creating tenant' });
@@ -60,13 +64,14 @@ class TenantController {
 
     async updateTenant(req: Request, res: Response) {
         const { id } = req.params;
-        const { name, description, email, app_name } = req.body;
+        const { name, description, email, app_name, business } = req.body;
         try {
             const tenant = await TenantService.updateTenant(Number(id), {
                 name,
                 description,
                 email,
                 app_name,
+                business,
                 update_at: new Date()
             });
             return res.status(StatusCodes.OK).json(tenant);
@@ -81,6 +86,9 @@ class TenantController {
                 }
                 if (error.message === 'Tenant not found') {
                     return res.status(StatusCodes.NOT_FOUND).json({ error: 'Tenant not found' });
+                }
+                if (error.message.includes('Some business IDs are invalid')) {
+                    return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid business IDs' });
                 }
             }
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error updating tenant' });

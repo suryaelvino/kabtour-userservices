@@ -1,17 +1,18 @@
 // services/BusinessService.ts
-import Business from '../models/business';
+import Business from '../models/businessModels';
 import { UniqueConstraintError } from 'sequelize';
 
 class BusinessService {
-    async createBusiness(data: { name: string }) {
+    async createBusiness(data: { name: string, created_at?: Date, update_at?: Date }) {
         try {
             const business = await Business.create(data);
-            return Promise.resolve(business);
+            return business;
         } catch (error) {
             if (error instanceof UniqueConstraintError) {
-                return Promise.reject(new Error('Business name already exists'));
+                throw new Error('Business name already exists');
             }
-            return Promise.reject(error);
+            console.error('Error creating business in service:', error);
+            throw new Error('Internal Server Error');
         }
     }
 
