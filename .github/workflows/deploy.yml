@@ -23,5 +23,5 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
         cd /itd/backend-identify
         git pull origin master
-      EOF
+        EOF
 
