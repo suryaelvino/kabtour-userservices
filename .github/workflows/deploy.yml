@@ -6,6 +6,7 @@ on:
       - master
 
 jobs:
+
   build-and-deploy:
     runs-on: ubuntu-latest
 
@@ -13,22 +14,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Upload code to VM
-      run: |
-        scp -i ${{ secrets.VM_SSH_KEY }} -r ./user-app ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/itd/backend-identify
-
     - name: Deploy to VM
+      env:
+        VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+        VM_USER: ${{ secrets.VM_USER }}
+        VM_HOST: ${{ secrets.VM_HOST }}
       run: |
-        ssh -i ${{ secrets.VM_SSH_KEY }} ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-          # Pindah ke direktori proyek di VM
+        # SSH ke VM
+        ssh -i $VM_SSH_KEY $VM_USER@$VM_HOST << EOF
           cd /itd/backend-identify
-
-          # Hapus container lama jika ada
+          
+          git pull
+          
           docker-compose down
-
-          # Bangun image Docker di VM
+          
           docker-compose build
-
-          # Jalankan container dengan image terbaru
+          
           docker-compose up -d
         EOF
