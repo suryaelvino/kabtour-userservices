@@ -1,41 +1,35 @@
-name: CI/CD Pipeline
+name: Deploy to VM
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
-
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Deploy to VM
-      env:
-        VM_HOST: ${{ secrets.VM_HOST }}
-        VM_USER: ${{ secrets.VM_USER }}
-        VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
-      run: |
-        # Setup SSH key
-        mkdir -p ~/.ssh
-        echo "$VM_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        
-        # SSH ke VM
-        ssh -o StrictHostKeyChecking=no $VM_USER@$VM_HOST << EOF
-          cd /itd/backend-identify
-          
-          git pull
-          
-          docker-compose down
-          
-          docker-compose build
-          
-          docker-compose up -d
-        EOF
+      - name: Setup SSH key
+        env:
+          VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$VM_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy to VM
+        env:
+          VM_USER: ${{ secrets.VM_USER }}
+          VM_HOST: ${{ secrets.VM_HOST }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $VM_USER@$VM_HOST << EOF
+            cd /itd/backend-identify
+            git pull
+            docker-compose down
+            docker-compose build
+            docker-compose up -d
+          EOF
