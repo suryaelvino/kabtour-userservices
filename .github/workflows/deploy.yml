@@ -57,6 +57,6 @@ jobs:
 
           docker pull ghcr.io/${{ github.repository }}/my-app:${{ github.sha }}
 
-          docker-compose down || true
+          docker-compose down
 
           docker-compose up -d
