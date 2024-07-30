@@ -23,7 +23,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.PAT_GITHUB }}
 
       - name: Build Docker image
         run: |
@@ -39,15 +39,12 @@ jobs:
           VM_USER: ${{ secrets.VM_USER }}
           VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
         run: |
-          # Setup SSH Agent and add private key
           eval $(ssh-agent -s)
           echo "$VM_SSH_PRIVATE_KEY" | ssh-add -
 
-          # SSH ke VM dan jalankan perintah deploy
           ssh -o StrictHostKeyChecking=no $VM_USER@$VM_HOST << EOF
             cd /itd/backend-identify
 
-            # Tarik image dari GHCR dan jalankan ulang container
             docker pull ghcr.io/${{ github.repository }}/my-app:${{ github.sha }}
             
             docker-compose down
