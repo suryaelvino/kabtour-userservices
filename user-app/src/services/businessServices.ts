@@ -3,10 +3,10 @@ import Business from '../models/businessModels';
 import { UniqueConstraintError } from 'sequelize';
 
 class BusinessService {
-    async createBusiness(data: { name: string, created_at?: Date, update_at?: Date }) {
+    async createBusiness(data: { name: string,description:string, created_at?: Date, updated_at?: Date }) {
         try {
             const business = await Business.create(data);
-            return business;
+            return Promise.resolve(business);
         } catch (error) {
             if (error instanceof UniqueConstraintError) {
                 throw new Error('Business name already exists');
@@ -50,7 +50,7 @@ class BusinessService {
         }
     }
 
-    async updateBusiness(id: number, data: { name?: string }) {
+    async updateBusiness(id: number, data: { name?: string, description?:string, updated_at:Date }) {
         try {
             const business = await Business.findByPk(id);
             if (business) {

@@ -4,11 +4,11 @@ import { StatusCodes } from 'http-status-codes';
 
 class BusinessController {
     async createBusiness(req: Request, res: Response) {
-        const { name } = req.body;
+        const { name, description } = req.body;
         const created_at = new Date();
-        const update_at = new Date();
+        const updated_at = new Date();
         try {
-            const business = await BusinessService.createBusiness({ name, created_at, update_at });
+            const business = await BusinessService.createBusiness({ name, description,created_at, updated_at });
             return res.status(StatusCodes.CREATED).json({ data: business });
         } catch (error: any) {
             console.error('Error creating business:', error);
@@ -52,9 +52,10 @@ class BusinessController {
 
     async updateBusiness(req: Request, res: Response) {
         const { id } = req.params;
-        const { name } = req.body;
+        const { name, description } = req.body;
+        const updated_at = new Date;
         try {
-            const business = await BusinessService.updateBusiness(Number(id), { name });
+            const business = await BusinessService.updateBusiness(Number(id), { name, description, updated_at });
             return res.status(StatusCodes.OK).json(business);
         } catch (error: any) {
             console.error('Error updating business:', error);

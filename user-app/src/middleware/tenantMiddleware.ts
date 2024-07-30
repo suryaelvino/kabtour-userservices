@@ -6,7 +6,7 @@ export const validateTenantInput = [
     body('description').notEmpty().withMessage('Description is required'),
     body('email').isEmail().withMessage('Email is invalid'),
     body('app_name').notEmpty().withMessage('App name is required'),
-
+    body('business').notEmpty().withMessage('Business is required'),
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

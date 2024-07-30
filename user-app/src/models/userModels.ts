@@ -1,25 +1,34 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database';
 
-class Business extends Model {
+class User extends Model {
     public id!: number;
     public name!: string;
+    public email!: string;
     public created_at!: Date;
     public updated_at!: Date;
 }
 
-Business.init({
+User.init({
     id: {
         type: DataTypes.INTEGER,
+        allowNull: false,
         primaryKey: true
     },
-    name: {
-        type: DataTypes.STRING(255),
+    first_name: {
+        type: DataTypes.STRING,
         allowNull: false,
-        unique: true
     },
-    description:{
-        type: DataTypes.STRING(255),
+    last_name:{
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    tenant_id : {
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     created_at: {
@@ -32,17 +41,17 @@ Business.init({
     }
 }, {
     sequelize,
-    modelName: 'Business',
-    tableName: 'business',
+    modelName: 'User',
+    tableName: 'user',
     timestamps: false,
     hooks: {
-        beforeCreate: async (business) => {
+        beforeCreate: async (user) => {
             let unique = false;
             while (!unique) {
                 const id = Math.floor(Math.random() * 100000000);
-                const existingBusiness = await Business.findByPk(id);
-                if (!existingBusiness) {
-                    business.id = id;
+                const existingUser = await User.findByPk(id);
+                if (!existingUser) {
+                    user.id = id;
                     unique = true;
                 }
             }
@@ -50,4 +59,4 @@ Business.init({
     }
 });
 
-export default Business;
+export default User;

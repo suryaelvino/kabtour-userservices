@@ -13,7 +13,7 @@ class TenantController {
                 app_name,
                 business,
                 created_at: new Date(),
-                update_at: new Date()
+                updated_at: new Date()
             });
             return res.status(StatusCodes.CREATED).json({ data: tenant });
         } catch (error: unknown) {
@@ -38,7 +38,7 @@ class TenantController {
         const limit = parseInt(req.query.limit as string, 10) || 10;
         try {
             const result = await TenantService.getTenants(page, limit);
-            return res.status(StatusCodes.OK).json(result);
+            return res.status(StatusCodes.OK).json({data: result});
         } catch (error: unknown) {
             console.error('Error fetching tenants:', error);
             if (error instanceof Error && error.message === 'No tenants found for the given page and limit') {
@@ -72,7 +72,7 @@ class TenantController {
                 email,
                 app_name,
                 business,
-                update_at: new Date()
+                updated_at: new Date()
             });
             return res.status(StatusCodes.OK).json(tenant);
         } catch (error: unknown) {

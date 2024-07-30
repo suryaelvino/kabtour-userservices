@@ -10,11 +10,15 @@ module.exports = {
                 allowNull: false,
                 unique: true
             },
+            description: {
+                type:Sequelize.STRING(255),
+                allowNull: false,
+            },
             created_at: {
                 type: Sequelize.DATE,
                 allowNull: false
             },
-            update_at: {
+            updated_at: {
                 type: Sequelize.DATE,
                 allowNull: false
             }

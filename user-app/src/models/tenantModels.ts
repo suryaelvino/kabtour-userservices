@@ -9,7 +9,7 @@ class Tenant extends Model {
     public business!: object;
     public app_name!: string;
     public created_at!: Date;
-    public update_at!: Date;
+    public updated_at!: Date;
 }
 
 Tenant.init({
@@ -43,7 +43,7 @@ Tenant.init({
         type: DataTypes.DATE,
         allowNull: false
     },
-    update_at: {
+    updated_at: {
         type: DataTypes.DATE,
         allowNull: false
     }
