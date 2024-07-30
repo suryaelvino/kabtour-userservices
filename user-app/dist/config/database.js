@@ -11,13 +11,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sequelize = void 0;
 const sequelize_1 = require("sequelize");
-// export const sequelize = new Sequelize('user', 'root', 'adminuser12_', {
-//     host: 'localhost',
+exports.sequelize = new sequelize_1.Sequelize('user', 'root', 'adminuser12_', {
+    host: 'postgres',
+    dialect: 'postgres',
+    port: 5432,
+});
+// export const sequelize =  new Sequelize('postgres://root:adminuser12_@postgres:5432/user', {
 //     dialect: 'postgres',
 // });
-exports.sequelize = new sequelize_1.Sequelize('postgres://root:adminuser12_@postgres:5432/user', {
-    dialect: 'postgres',
-});
 exports.default = exports.sequelize;
 const authenticateDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
