@@ -37,6 +37,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+    - name: Upload code to VM
+      uses: appleboy/scp-action@v1
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        source: "."
+        target: "/itd/backend-identify"
+
     - name: Deploy to VM
       uses: appleboy/drone-ssh-action@v1
       with:
@@ -44,10 +53,34 @@ jobs:
         username: ${{ secrets.VM_USER }}
         key: ${{ secrets.VM_SSH_KEY }}
         script: |
+          # Memeriksa dan menginstal Docker jika tidak ada
+          if ! command -v docker &> /dev/null; then
+            echo "Docker tidak ditemukan. Menginstal Docker..."
+            sudo apt-get update
+            sudo apt-get install -y docker.io
+            sudo systemctl start docker
+            sudo systemctl enable docker
+          else
+            echo "Docker sudah terinstal."
+          fi
+
+          # Memeriksa dan menginstal Docker Compose jika tidak ada
+          if ! command -v docker-compose &> /dev/null; then
+            echo "Docker Compose tidak ditemukan. Menginstal Docker Compose..."
+            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          else
+            echo "Docker Compose sudah terinstal."
+          fi
+
+          # Pindah ke direktori proyek di VM
           cd /itd/backend-identify
 
+          # Tarik image terbaru dari GHCR
           docker pull ghcr.io/${{ github.repository }}/my-app:${{ github.sha }}
 
+          # Hentikan dan hapus container lama
           docker-compose down || true
 
+          # Bangun dan jalankan container dengan image terbaru
           docker-compose up -d
