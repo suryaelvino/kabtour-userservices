@@ -1,9 +1,8 @@
-name: Deploy to VM
+name: CI/CD
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
 
 jobs:
   deploy:
@@ -11,17 +10,24 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
-    - name: Setup SSH Key
-      run: |
-        echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+    - name: Copy files via scp
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        source: "."
+        target: "/itd/backend-identify"
 
-    - name: Deploy to VM
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-        cd /itd/backend-identify
-        git pull origin master
-        EOF
-
+    - name: Execute Docker Compose on the server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          cd /itd/backend-identy
+          docker-compose down
+          docker-compose up --build -d
