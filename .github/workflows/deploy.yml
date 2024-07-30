@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Deploy to VM
 
 on:
   push:
@@ -10,10 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Clone project on VM
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Deploy to VM
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i ${{ secrets.VM_SSH_KEY }} ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
           cd /itd/backend-identify
           
-          git clone git@github.com:suryaelvino/kabtour-userservices.git
+          git pull origin master
         EOF
