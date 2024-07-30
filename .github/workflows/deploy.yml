@@ -38,7 +38,7 @@ jobs:
     needs: build
     steps:
     - name: Upload code to VM
-      uses: appleboy/scp-action@v1
+      uses: appleboy/scp-action@v0.1.0
       with:
         host: ${{ secrets.VM_HOST }}
         username: ${{ secrets.VM_USER }}
@@ -47,7 +47,7 @@ jobs:
         target: "/itd/backend-identify"
 
     - name: Deploy to VM
-      uses: appleboy/scp-action@v1
+      uses: appleboy/scp-action@v0.1.0
       with:
         host: ${{ secrets.VM_HOST }}
         username: ${{ secrets.VM_USER }}
