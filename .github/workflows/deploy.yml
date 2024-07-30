@@ -1,47 +1,41 @@
-name: Deploy to VM
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
-  deploy:
+
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.VM_SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-        env:
-          VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
-
-      - name: Debug SSH Key
-        run: |
-          ls -l ~/.ssh
-          cat ~/.ssh/id_rsa
-
-      - name: Test SSH Connection
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'echo "SSH connection successful"'
-        env:
-          VM_USER: ${{ secrets.VM_USER }}
-          VM_HOST: ${{ secrets.VM_HOST }}
-
-      - name: Deploy to VM
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << EOF
-            cd /itd/backend-identify
-            git pull
-            docker-compose down
-            docker-compose build
-            docker-compose up -d
-          EOF
-        env:
-          VM_USER: ${{ secrets.VM_USER }}
-          VM_HOST: ${{ secrets.VM_HOST }}
+    - name: Deploy to VM
+      env:
+        VM_HOST: ${{ secrets.VM_HOST }}
+        VM_USER: ${{ secrets.VM_USER }}
+        VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+      run: |
+        # Setup SSH key
+        mkdir -p ~/.ssh
+        echo "$VM_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        # SSH ke VM
+        ssh -o StrictHostKeyChecking=no $VM_USER@$VM_HOST << EOF
+          cd /itd/backend-identify
+          
+          git pull
+          
+          docker-compose down
+          
+          docker-compose build
+          
+          docker-compose up -d
+        EOF
