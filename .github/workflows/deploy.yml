@@ -13,10 +13,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Setup SSH Key
+      run: |
+      echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
+      chmod 600 ~/.ssh/id_rsa
+
     - name: Deploy to VM
       run: |
-        ssh -o StrictHostKeyChecking=no -i ${{ secrets.VM_SSH_KEY }} ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-          cd /itd/backend-identify
-          
-          git pull origin master
-        EOF
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+        cd /itd/backend-identify
+        git pull origin master
+      EOF
+
