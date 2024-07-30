@@ -39,20 +39,9 @@ jobs:
           VM_USER: ${{ secrets.VM_USER }}
           VM_SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
         run: |
-          # Setup SSH key
-          mkdir -p ~/.ssh
-          echo "$VM_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          
-          # Setup SSH Agent and add private key
-          eval $(ssh-agent -s)
-          ssh-add ~/.ssh/id_rsa
-
-          # SSH ke VM dan jalankan perintah deploy
           ssh -o StrictHostKeyChecking=no $VM_USER@$VM_HOST << EOF
             cd /itd/backend-identify
 
-            # Tarik image dari GHCR dan jalankan ulang container
             docker pull ghcr.io/${{ github.repository }}/my-app:${{ github.sha }}
             
             docker-compose down
