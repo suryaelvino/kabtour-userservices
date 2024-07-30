@@ -14,25 +14,21 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Upload code to VM
-      uses: appleboy/scp-action@v1
-      with:
-        host: ${{ secrets.VM_HOST }}
-        username: ${{ secrets.VM_USER }}
-        key: ${{ secrets.VM_SSH_KEY }}
-        source: './user-app'
-        target: '/itd/backend-identify'
+      run: |
+        scp -i ${{ secrets.VM_SSH_KEY }} -r ./user-app ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/itd/backend-identify
 
     - name: Deploy to VM
-      uses: appleboy/ssh-action@v1
-      with:
-        host: ${{ secrets.VM_HOST }}
-        username: ${{ secrets.VM_USER }}
-        key: ${{ secrets.VM_SSH_KEY }}
-        script: |
+      run: |
+        ssh -i ${{ secrets.VM_SSH_KEY }} ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+          # Pindah ke direktori proyek di VM
           cd /itd/backend-identify
 
+          # Hapus container lama jika ada
           docker-compose down
 
+          # Bangun image Docker di VM
           docker-compose build
 
+          # Jalankan container dengan image terbaru
           docker-compose up -d
+        EOF
