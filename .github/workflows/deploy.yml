@@ -25,22 +25,13 @@ jobs:
           scp -o StrictHostKeyChecking=no -i /tmp/id_rsa -r ./* ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/var/www/html/backend-catalog
 
     - name: Deploy to VM
-      uses: appleboy/scp-action@v0.1.0
-      env:
-          SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-      run: |
-          ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} <<EOF
-
-           cd /var/www/html/backend-catalog
-
-           git pull origin master
-
-           sudo docker-compose down
-
-           sudo docker-compose up -d
-          EOF
+      uses: appleboy/ssh-action@master
+      with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/html/backend-catalog
+            git pull origin master
+            sudo docker-compose down
+            sudo docker-compose up -d
