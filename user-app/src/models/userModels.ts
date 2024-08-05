@@ -3,8 +3,10 @@ import { sequelize } from '../config/database';
 
 class User extends Model {
     public id!: number;
-    public name!: string;
+    public first_name!: string;
+    public last_name!: string;
     public email!: string;
+    public verified!: boolean;
     public created_at!: Date;
     public updated_at!: Date;
 }
@@ -19,13 +21,31 @@ User.init({
         type: DataTypes.STRING,
         allowNull: false,
     },
-    last_name:{
+    last_name: {
         type: DataTypes.STRING,
         allowNull: false,
     },
     email: {
         type: DataTypes.STRING,
         allowNull: false,
+    },
+    phonenumber: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    gender: {
+        type: DataTypes.ENUM('male', 'female'),
+        allowNull: false,
+    },
+    bank_account: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+    },
+    verified: {
+        type: DataTypes.BOOLEAN
+    },
+    role: {
+        type: DataTypes.ENUM('superadmin', 'admin', 'approval', 'partner', 'traveler')
     },
     tenant_id : {
         type: DataTypes.INTEGER,
@@ -44,6 +64,12 @@ User.init({
     modelName: 'User',
     tableName: 'user',
     timestamps: false,
+    indexes: [
+        {
+            unique: true,
+            fields: ['email', 'tenant_id', 'role']
+        }
+    ],
     hooks: {
         beforeCreate: async (user) => {
             let unique = false;

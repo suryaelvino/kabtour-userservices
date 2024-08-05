@@ -29,7 +29,7 @@ class TenantController {
                     return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid business IDs' });
                 }
             }
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error creating tenant' });
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
         }
     }
 

@@ -6,48 +6,41 @@ on:
       - master
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.PAT_GITHUB }}
-
-    - name: Build Docker image
+    - name: Upload code to VM
+      env:
+          SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
       run: |
-        docker build -t ghcr.io/${{ github.repository }}/my-app:${{ github.sha }} ./user-app
+          # Save SSH key to a temporary file
+          echo "$SSH_PRIVATE_KEY" > /tmp/id_rsa
+          chmod 600 /tmp/id_rsa
 
-    - name: Push Docker image to GHCR
-      run: |
-        docker push ghcr.io/${{ github.repository }}/my-app:${{ github.sha }}
+          # Upload the application code to the VM
+          scp -o StrictHostKeyChecking=no -i /tmp/id_rsa -r ./* ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/var/www/html/backend-catalog
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
     - name: Deploy to VM
       uses: appleboy/scp-action@v0.1.0
-      with:
-        host: ${{ secrets.VM_HOST }}
-        username: ${{ secrets.VM_USER }}
-        key: ${{ secrets.VM_SSH_KEY }}
-        script: |
-          cd /itd/backend-identify
+      env:
+          SSH_PRIVATE_KEY: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+      run: |
+          ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} <<EOF
 
-          docker pull ghcr.io/${{ github.repository }}/my-app:${{ github.sha }}
+           cd /var/www/html/backend-catalog
 
-          docker-compose down
+           git pull origin master
 
-          docker-compose up -d
+           sudo docker-compose down
+
+           sudo docker-compose up -d
+          EOF
